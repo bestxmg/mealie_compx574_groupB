@@ -86,3 +86,18 @@ def global_cleanup() -> Generator[None, None, None]:
 
     yield None
     _clean_temp_dir()
+
+
+@fixture(autouse=True)
+def reset_settings_cache() -> Generator[None, None, None]:
+    """Clear lru_cache on configuration getters before and after every test.
+
+    Under parallel test execution, tests that mutate environment variables or
+    settings can leak state across tests on the same worker via lru_cache.
+    Clearing the cache prevents cached state from affecting subsequent tests.
+    """
+    config.get_app_settings.cache_clear()
+    config.get_app_dirs.cache_clear()
+    yield
+    config.get_app_settings.cache_clear()
+    config.get_app_dirs.cache_clear()
