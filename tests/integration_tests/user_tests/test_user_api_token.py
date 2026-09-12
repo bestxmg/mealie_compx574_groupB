@@ -45,12 +45,31 @@ def test_use_token(api_client: TestClient, long_live_token):
     assert response.status_code == 200
 
 
-def test_delete_token(api_client: TestClient, admin_token):
-    response = api_client.delete(api_routes.users_api_tokens_token_id(1), headers=admin_token)
-    assert response.status_code == 200
+def test_delete_token(api_client: TestClient, admin_token: dict[str, str]) -> None:
+    """Ensure API tokens can be deleted by their dynamic ID without hardcoded assumptions."""
+    # Create distinct tokens first to obtain reliable IDs for deletion under parallel execution
+    create_res_1 = api_client.post(
+        api_routes.users_api_tokens,
+        json={"name": "Token to Delete 1"},
+        headers=admin_token,
+    )
+    assert create_res_1.status_code == 201
+    token_1_id: int = create_res_1.json()["id"]
 
-    response = api_client.delete(api_routes.users_api_tokens_token_id(2), headers=admin_token)
-    assert response.status_code == 200
+    create_res_2 = api_client.post(
+        api_routes.users_api_tokens,
+        json={"name": "Token to Delete 2"},
+        headers=admin_token,
+    )
+    assert create_res_2.status_code == 201
+    token_2_id: int = create_res_2.json()["id"]
+
+    # Delete the created tokens by dynamic ID
+    response_1 = api_client.delete(api_routes.users_api_tokens_token_id(token_1_id), headers=admin_token)
+    assert response_1.status_code == 200
+
+    response_2 = api_client.delete(api_routes.users_api_tokens_token_id(token_2_id), headers=admin_token)
+    assert response_2.status_code == 200
 
 
 def test_delete_token_denies_other_users(api_client: TestClient, unique_user: TestUser, unique_admin: TestUser):
