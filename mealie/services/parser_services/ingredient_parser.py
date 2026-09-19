@@ -255,6 +255,7 @@ class NLPParser(ABCIngredientParser):
                     unit=CreateIngredientUnit(name=part.unit) if part.unit else None,
                     food=CreateIngredientFood(name=part.food) if part.food else None,
                     note=ing_note,
+                    original_text=ingredient.sentence
                 )
             )
 

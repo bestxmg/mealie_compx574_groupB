@@ -167,3 +167,11 @@ def test_nlp_parser_converts_extra_ingredients(
     # the amount has nowhere to live on a substitution, so the whole thing stays as text
     assert substitutions[2].substitute_food_id is None
     assert substitutions[2].note and "onion" in substitutions[2].note
+
+@pytest.mark.asyncio
+async def test_nlp_parser_sets_original_text(unique_local_group_id: UUID4):
+    with session_context() as session:
+        parser = get_parser(RegisteredParser.nlp, unique_local_group_id, session, get_locale_provider())
+        test_str = "1/2 cup all-purpose flour"
+        parsed = await parser.parse_one(test_str)
+        assert parsed.ingredient.original_text == test_str
