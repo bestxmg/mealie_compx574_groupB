@@ -39,7 +39,7 @@ const baseText = computed(() => {
 .links-disabled :deep(a) {
   pointer-events: none;
   cursor: default;
-  color: var(--v-theme-primary);
+  color: var(--p-primary-color);
   text-decoration: none;
 }
 </style>

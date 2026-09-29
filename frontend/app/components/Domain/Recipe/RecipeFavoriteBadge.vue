@@ -1,34 +1,26 @@
 <template>
-  <v-tooltip
-    location="bottom"
-    nudge-right="50"
-    :color="buttonStyle ? 'info' : 'secondary'"
+  <Button
+    v-if="isFavorite || showAlways"
+    v-tooltip.bottom="isFavorite ? $t('recipe.remove-from-favorites') : $t('recipe.add-to-favorites')"
+    rounded
+    :severity="buttonStyle ? 'info' : 'secondary'"
+    :variant="buttonStyle ? undefined : 'text'"
+    size="small"
+    v-bind="$attrs"
+    @click.prevent="toggleFavorite"
   >
-    <template #activator="{ props: tooltipProps }">
-      <v-btn
-        v-if="isFavorite || showAlways"
-        icon
-        :variant="buttonStyle ? 'flat' : undefined"
-        :rounded="buttonStyle ? 'circle' : undefined"
-        size="small"
-        :color="buttonStyle ? 'info' : 'secondary'"
-        :fab="buttonStyle"
-        v-bind="{ ...tooltipProps, ...$attrs }"
-        @click.prevent="toggleFavorite"
-      >
-        <v-icon
-          :size="!buttonStyle ? undefined : 'x-large'"
-          :color="buttonStyle ? 'white' : 'secondary'"
-        >
-          {{ isFavorite ? $globals.icons.heart : $globals.icons.heartOutline }}
-        </v-icon>
-      </v-btn>
+    <template #icon>
+      <AppIcon
+        :icon="isFavorite ? $globals.icons.heart : $globals.icons.heartOutline"
+        :size="!buttonStyle ? '1.25rem' : '1.75rem'"
+      />
     </template>
-    <span>{{ isFavorite ? $t("recipe.remove-from-favorites") : $t("recipe.add-to-favorites") }}</span>
-  </v-tooltip>
+  </Button>
 </template>
 
 <script setup lang="ts">
+import Button from "primevue/button";
+import AppIcon from "~/components/global/AppIcon.vue";
 import { useUserSelfRatings } from "~/composables/use-users";
 import { useUserApi } from "~/composables/api";
 
