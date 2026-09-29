@@ -1,17 +1,16 @@
 <template>
-  <v-chip
+  <Tag
     v-bind="$attrs"
-    label
-    variant="flat"
-    :color="label.color || undefined"
+    :style="label.color ? { backgroundColor: label.color, color: '#fff' } : undefined"
+    class="text-truncate"
+    style="max-width: 100%"
   >
-    <span style="max-width: 100%; overflow: hidden; text-overflow: ellipsis;">
-      {{ label.name }}
-    </span>
-  </v-chip>
+    {{ label.name }}
+  </Tag>
 </template>
 
 <script setup lang="ts">
+import Tag from "primevue/tag";
 import type { MultiPurposeLabelSummary } from "~/lib/api/types/recipe";
 
 defineProps<{

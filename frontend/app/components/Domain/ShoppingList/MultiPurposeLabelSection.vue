@@ -2,9 +2,10 @@
   <div class="d-flex justify-space-between align-center mx-2">
     <div class="handle">
       <span class="mr-2">
-        <v-icon :color="labelColor">
-          {{ $globals.icons.tags }}
-        </v-icon>
+        <AppIcon
+          :icon="$globals.icons.tags"
+          :style="labelColor ? { color: labelColor } : undefined"
+        />
       </span>
       {{ modelValue.label.name }}
     </div>
@@ -12,30 +13,23 @@
       style="min-width: 72px"
       class="ml-auto text-right"
     >
-      <v-menu
-        offset-x
-        start
-        min-width="125px"
+      <!-- The Vuetify v-menu here had an activator but no menu items -- it was a drag
+           handle icon, not an actual functioning menu. Kept as a plain button to match. -->
+      <Button
+        size="small"
+        text
+        rounded
+        class="ml-2 handle"
       >
-        <template #activator="{ props: hoverProps }">
-          <v-btn
-            size="small"
-            variant="text"
-            class="ml-2 handle"
-            icon
-            v-bind="hoverProps"
-          >
-            <v-icon>
-              {{ $globals.icons.arrowUpDown }}
-            </v-icon>
-          </v-btn>
-        </template>
-      </v-menu>
+        <AppIcon :icon="$globals.icons.arrowUpDown" />
+      </Button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import Button from "primevue/button";
+import AppIcon from "~/components/global/AppIcon.vue";
 import type { ShoppingListMultiPurposeLabelOut } from "~/lib/api/types/household";
 
 const props = defineProps<{
