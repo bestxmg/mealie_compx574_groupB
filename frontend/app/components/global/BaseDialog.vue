@@ -4,60 +4,71 @@
       name="activator"
       v-bind="{ open }"
     />
-    <v-bottom-sheet
-      v-if="bottomSheet && $vuetify.display.xs"
-      v-model="dialog"
-      content-class="rounded-t-xl"
-      :content-props="{
-        style: 'overflow: hidden',
-      }"
-      :max-width="maxWidth ?? undefined"
+    <Dialog
+      v-model:visible="dialog"
+      modal
+      :position="bottomSheet && isMobile ? 'bottom' : (top ? 'top' : 'center')"
+      :style="{ width: isMobile ? '100%' : dialogWidth }"
+      :maximizable="false"
+      :class="[top ? 'top-dialog' : '', bottomSheet && isMobile ? 'bottom-sheet-dialog' : '']"
       @keydown.enter="submitOnEnter"
-      @click:outside="emit('cancel')"
+      @update:visible="(val) => !val && emit('cancel')"
       @keydown.esc="emit('cancel')"
     >
-      <BaseDialogContent v-bind="bindings">
-        <template #default>
-          <slot v-bind="{ submitEvent }" />
-        </template>
-        <template #card-actions>
-          <slot name="card-actions" />
-        </template>
-        <template #custom-card-action>
-          <slot name="custom-card-action" />
-        </template>
-      </BaseDialogContent>
-    </v-bottom-sheet>
-    <v-dialog
-      v-else
-      v-model="dialog"
-      :width="width"
-      :max-width="maxWidth ?? undefined"
-      :content-class="top ? 'top-dialog' : undefined"
-      :fullscreen="$vuetify.display.xs"
-      @keydown.enter="submitOnEnter"
-      @click:outside="emit('cancel')"
-      @keydown.esc="emit('cancel')"
-    >
-      <BaseDialogContent v-bind="bindings">
-        <template #default>
-          <slot v-bind="{ submitEvent }" />
-        </template>
-        <template #card-actions>
-          <slot name="card-actions" />
-        </template>
-        <template #custom-card-action>
-          <slot name="custom-card-action" />
-        </template>
-      </BaseDialogContent>
-    </v-dialog>
+      <template #header>
+        <div class="flex align-items-center gap-2">
+          <AppIcon
+            v-if="icon"
+            :icon="icon"
+          />
+          <span class="font-bold">{{ title }}</span>
+        </div>
+      </template>
+
+      <ProgressBar
+        v-if="loading"
+        mode="indeterminate"
+        style="height: 4px"
+        class="mb-3"
+      />
+
+      <slot v-bind="{ submitEvent }" />
+
+      <template #footer>
+        <BaseDialogContent
+          :color="color"
+          :loading="loading"
+          :is-mobile="isMobile"
+          :submit-icon="submitIcon"
+          :submit-text="submitText"
+          :submit-disabled="submitDisabled"
+          :cancel-text="cancelText"
+          :can-delete="canDelete"
+          :can-confirm="canConfirm"
+          :can-submit="canSubmit"
+          @cancel="bindings.onCancel"
+          @confirm="bindings.onConfirm"
+          @submit="bindings.onSubmit"
+          @delete="bindings.onDelete"
+        >
+          <template #card-actions>
+            <slot name="card-actions" />
+          </template>
+          <template #custom-card-action>
+            <slot name="custom-card-action" />
+          </template>
+        </BaseDialogContent>
+      </template>
+    </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useGlobalI18n } from "~/composables/use-global-i18n";
+import Dialog from "primevue/dialog";
+import ProgressBar from "primevue/progressbar";
+import AppIcon from "~/components/global/AppIcon.vue";
 
-const i18n = useGlobalI18n();
+const { xs: isMobile } = useBreakpoints();
 
 interface DialogProps {
   modelValue: boolean;
@@ -91,7 +102,6 @@ interface DialogEmits {
   (e: "submit" | "cancel" | "confirm" | "delete" | "close"): void;
 }
 
-// Using TypeScript interface with withDefaults for props
 const props = withDefaults(defineProps<DialogProps>(), {
   color: "primary",
   title: "Modal Title",
@@ -118,6 +128,12 @@ const emit = defineEmits<DialogEmits>();
 const dialog = computed({
   get: () => props.modelValue,
   set: val => emit("update:modelValue", val),
+});
+
+// PrimeVue's Dialog wants a CSS width, not a bare number like Vuetify's :width="500" did.
+const dialogWidth = computed(() => {
+  const w = props.maxWidth ?? props.width;
+  return typeof w === "number" || /^\d+$/.test(String(w)) ? `${w}px` : String(w);
 });
 
 const submitted = ref(false);
@@ -168,18 +184,7 @@ function open() {
   dialog.value = true;
 }
 
-const bindings = computed(() => ({
-  color: props.color,
-  title: props.title,
-  icon: props.icon,
-  loading: props.loading,
-  submitIcon: props.submitIcon,
-  submitText: props.submitText ?? i18n.t("general.create"),
-  submitDisabled: props.submitDisabled,
-  cancelText: props.cancelText ?? i18n.t("general.cancel"),
-  canDelete: props.canDelete,
-  canConfirm: props.canConfirm,
-  canSubmit: props.canSubmit,
+const bindings = {
   onCancel: () => {
     emit("cancel");
     dialog.value = false;
@@ -190,12 +195,16 @@ const bindings = computed(() => ({
   },
   onSubmit: submitEvent,
   onDelete: deleteEvent,
-}));
+};
 </script>
 
 <style>
 .top-dialog {
   position: fixed;
   top: 0;
+}
+
+.bottom-sheet-dialog .p-dialog-content {
+  border-radius: 1.25rem 1.25rem 0 0;
 }
 </style>

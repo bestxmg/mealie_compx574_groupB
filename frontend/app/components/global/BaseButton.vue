@@ -1,38 +1,40 @@
 <template>
-  <v-btn
-    :color="color || btnAttrs.color"
-    :size="small ? 'small' : 'default'"
-    :x-small="xSmall"
+  <Button
+    :severity="disabled ? undefined : color ? mapColorToSeverity(color) : btnAttrs.severity"
+    :size="small || xSmall ? 'small' : undefined"
     :loading="loading"
     :disabled="disabled"
-    :variant="disabled ? 'tonal' : btnStyle.outlined ? 'outlined' : btnStyle.text ? 'text' : 'elevated'"
-    :to="to"
+    :variant="disabled ? 'text' : btnStyle.outlined ? 'outlined' : btnStyle.text ? 'text' : undefined"
+    :as="to ? 'router-link' : 'button'"
+    :to="to || undefined"
     v-bind="$attrs"
     @click="download ? downloadFile() : undefined"
   >
-    <v-icon
+    <template
       v-if="!iconRight"
-      start
+      #icon
     >
       <slot name="icon">
-        {{ icon || btnAttrs.icon }}
+        <AppIcon
+          :icon="icon || btnAttrs.icon"
+          size="1.25rem"
+        />
       </slot>
-    </v-icon>
+    </template>
     <slot name="default">
       {{ text || btnAttrs.text }}
     </slot>
-    <v-icon
+    <AppIcon
       v-if="iconRight"
-      end
-    >
-      <slot name="icon">
-        {{ icon || btnAttrs.icon }}
-      </slot>
-    </v-icon>
-  </v-btn>
+      :icon="icon || btnAttrs.icon"
+      size="1.25rem"
+    />
+  </Button>
 </template>
 
 <script setup lang="ts">
+import Button from "primevue/button";
+import AppIcon from "~/components/global/AppIcon.vue";
 import { useUserApi } from "~/composables/api";
 
 const props = defineProps({
@@ -116,41 +118,44 @@ const props = defineProps({
 const i18n = useI18n();
 const { $globals } = useNuxtApp();
 
+// PrimeVue's Button uses "severity" (its built-in palette names), not raw color strings.
+// Vuetify's "success"/"info"/"error"/"warning" already match PrimeVue's severity names 1:1;
+// only "grey" (used by cancel) doesn't exist in PrimeVue and maps to "secondary" instead.
 const buttonOptions = {
   create: {
     text: i18n.t("general.create"),
     icon: $globals.icons.createAlt,
-    color: "success",
+    severity: "success",
   },
   update: {
     text: i18n.t("general.update"),
     icon: $globals.icons.edit,
-    color: "success",
+    severity: "success",
   },
   save: {
     text: i18n.t("general.save"),
     icon: $globals.icons.save,
-    color: "success",
+    severity: "success",
   },
   edit: {
     text: i18n.t("general.edit"),
     icon: $globals.icons.edit,
-    color: "info",
+    severity: "info",
   },
   delete: {
     text: i18n.t("general.delete"),
     icon: $globals.icons.delete,
-    color: "error",
+    severity: "danger",
   },
   cancel: {
     text: i18n.t("general.cancel"),
     icon: $globals.icons.close,
-    color: "grey",
+    severity: "secondary",
   },
   download: {
     text: i18n.t("general.download"),
     icon: $globals.icons.download,
-    color: "info",
+    severity: "info",
   },
 };
 
@@ -181,6 +186,13 @@ const buttonStyles = {
   secondary: { text: false, outlined: true },
   minor: { text: true, outlined: false },
 };
+
+// Callers still pass Vuetify's color names via the `color` prop (e.g. color="error").
+// PrimeVue's severity names differ in two spots: "error" -> "danger", "grey" -> "secondary".
+function mapColorToSeverity(vuetifyColor: string): string {
+  const map: Record<string, string> = { error: "danger", grey: "secondary", gray: "secondary" };
+  return map[vuetifyColor] ?? vuetifyColor;
+}
 
 const btnStyle = computed(() => {
   if (props.secondary) {

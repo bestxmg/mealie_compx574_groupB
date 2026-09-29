@@ -1,5 +1,6 @@
 import { fileURLToPath } from "node:url";
 import { defineNuxtConfig } from "nuxt/config";
+import { MealiePreset } from "./app/theme/mealie-preset";
 
 const AUTH_TOKEN = "mealie.access_token";
 
@@ -11,9 +12,24 @@ export default defineNuxtConfig({
     "@vite-pwa/nuxt",
     "@nuxtjs/i18n",
     "@nuxt/fonts",
+    // TODO(rewrite/primevue-nuxt-removal): remove once every component is migrated to PrimeVue.
     "vuetify-nuxt-module",
+    "@primevue/nuxt-module",
     "@nuxt/eslint",
   ],
+
+  primevue: {
+    options: {
+      theme: {
+        preset: MealiePreset,
+        options: {
+          // Vuetify's classes stay in the DOM during the transition; don't let PrimeVue's
+          // dark-mode class selector collide with them.
+          darkModeSelector: ".mealie-dark-mode",
+        },
+      },
+    },
+  },
   ssr: false,
 
   components: [
