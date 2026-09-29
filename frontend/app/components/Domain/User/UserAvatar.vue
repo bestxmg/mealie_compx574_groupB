@@ -1,41 +1,19 @@
 <template>
-  <v-tooltip
+  <span
     v-if="userId"
-    :disabled="!user || !tooltip"
-    location="end"
+    v-tooltip.top="tooltip && user ? user.fullName : undefined"
   >
-    <template #activator="{ props: tooltipProps }">
-      <v-avatar
-        v-if="list"
-        v-bind="tooltipProps"
-      >
-        <v-img
-          :src="imageURL"
-          :alt="userId"
-          @load="error = false"
-          @error="error = true"
-        />
-      </v-avatar>
-      <v-avatar
-        v-else
-        :size="size"
-        v-bind="tooltipProps"
-      >
-        <v-img
-          :src="imageURL"
-          :alt="userId"
-          @load="error = false"
-          @error="error = true"
-        />
-      </v-avatar>
-    </template>
-    <span v-if="user">
-      {{ user.fullName }}
-    </span>
-  </v-tooltip>
+    <Avatar
+      :image="imageURL"
+      shape="circle"
+      :style="{ width: `${avatarSize}px`, height: `${avatarSize}px` }"
+      @error="error = true"
+    />
+  </span>
 </template>
 
 <script setup lang="ts">
+import Avatar from "primevue/avatar";
 import { useUserStore } from "~/composables/store/use-user-store";
 
 const props = defineProps({
@@ -64,6 +42,10 @@ const { store: users } = useUserStore();
 const user = computed(() => {
   return users.value.find(user => user.id === props.userId);
 });
+
+// Vuetify's v-avatar defaulted to 48px when no explicit size was given (the `list` case);
+// PrimeVue's Avatar needs an explicit size either way.
+const avatarSize = computed(() => (props.list ? 48 : Number(props.size)));
 
 const imageURL = computed(() => {
   // Note: auth.user is a ref now
