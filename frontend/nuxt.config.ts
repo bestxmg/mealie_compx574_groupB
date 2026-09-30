@@ -18,18 +18,6 @@ export default defineNuxtConfig({
     "@nuxt/eslint",
   ],
 
-  primevue: {
-    options: {
-      theme: {
-        preset: MealiePreset,
-        options: {
-          // Vuetify's classes stay in the DOM during the transition; don't let PrimeVue's
-          // dark-mode class selector collide with them.
-          darkModeSelector: ".mealie-dark-mode",
-        },
-      },
-    },
-  },
   ssr: false,
 
   components: [
@@ -242,6 +230,19 @@ export default defineNuxtConfig({
       escapeHtml: true,
     },
     vueI18n: "./../app/i18n.config.ts", // note: we need to up one ../ because the default root of lang dir is the /frontend/i18n, which can not be configured
+  },
+
+  primevue: {
+    options: {
+      theme: {
+        preset: MealiePreset,
+        options: {
+          // Vuetify's classes stay in the DOM during the transition; don't let PrimeVue's
+          // dark-mode class selector collide with them.
+          darkModeSelector: ".mealie-dark-mode",
+        },
+      },
+    },
   },
 
   // PWA module configuration: https://vite-pwa-org.netlify.app/frameworks/nuxt.html
