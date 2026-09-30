@@ -132,7 +132,7 @@ const dialog = computed({
 
 // PrimeVue's Dialog wants a CSS width, not a bare number like Vuetify's :width="500" did.
 const dialogWidth = computed(() => {
-  const w = props.maxWidth ?? props.width;
+  const w = props.maxWidth ?? props.width ?? "500";
   return typeof w === "number" || /^\d+$/.test(String(w)) ? `${w}px` : String(w);
 });
 

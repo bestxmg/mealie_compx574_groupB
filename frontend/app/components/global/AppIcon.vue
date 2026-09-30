@@ -25,7 +25,9 @@ withDefaults(
     size?: string | number;
   }>(),
   {
-    size: "1.5rem",
+    // Scales with the parent's font-size by default, matching how Vuetify's font-icon
+    // sizing worked -- callers that need a fixed size still pass an explicit size prop.
+    size: "1em",
   },
 );
 </script>

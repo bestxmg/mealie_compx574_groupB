@@ -191,7 +191,8 @@ const buttonStyles = {
 // PrimeVue's severity names differ in two spots: "error" -> "danger", "grey" -> "secondary".
 function mapColorToSeverity(vuetifyColor: string): string {
   const map: Record<string, string> = { error: "danger", grey: "secondary", gray: "secondary" };
-  return map[vuetifyColor] ?? vuetifyColor;
+  const key = vuetifyColor.toLowerCase();
+  return map[key] ?? key;
 }
 
 const btnStyle = computed(() => {
