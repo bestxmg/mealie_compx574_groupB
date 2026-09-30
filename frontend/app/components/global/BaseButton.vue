@@ -190,7 +190,7 @@ const buttonStyles = {
 // Callers still pass Vuetify's color names via the `color` prop (e.g. color="error").
 // PrimeVue's severity names differ in two spots: "error" -> "danger", "grey" -> "secondary".
 function mapColorToSeverity(vuetifyColor: string): string {
-  const map: Record<string, string> = { error: "danger", grey: "secondary", gray: "secondary" };
+  const map: Record<string, string> = { error: "danger", warning: "warn", grey: "secondary", gray: "secondary" };
   const key = vuetifyColor.toLowerCase();
   return map[key] ?? key;
 }

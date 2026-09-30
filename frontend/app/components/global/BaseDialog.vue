@@ -131,9 +131,13 @@ const dialog = computed({
 });
 
 // PrimeVue's Dialog wants a CSS width, not a bare number like Vuetify's :width="500" did.
+// A numeric or digit-string value of 0 or less isn't a usable width -- fall back to the
+// default rather than collapsing the dialog to 0px or emitting invalid CSS like "-200px".
 const dialogWidth = computed(() => {
   const w = props.maxWidth ?? props.width ?? "500";
-  return typeof w === "number" || /^\d+$/.test(String(w)) ? `${w}px` : String(w);
+  const px = typeof w === "number" ? w : (/^\d+$/.test(w) ? Number(w) : null);
+  if (px !== null) return px > 0 ? `${px}px` : "500px";
+  return String(w);
 });
 
 const submitted = ref(false);
