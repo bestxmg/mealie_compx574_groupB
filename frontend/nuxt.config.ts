@@ -11,6 +11,7 @@ export default defineNuxtConfig({
     "@nuxtjs/i18n",
     "@nuxt/fonts",
     "vuetify-nuxt-module",
+    "@primevue/nuxt-module",
     "@nuxt/eslint",
   ],
   ssr: false,
@@ -211,6 +212,23 @@ export default defineNuxtConfig({
       escapeHtml: true,
     },
     vueI18n: "./../app/i18n.config.ts", // note: we need to up one ../ because the default root of lang dir is the /frontend/i18n, which can not be configured
+  },
+
+  primevue: {
+    importTheme: {
+      from: "~/primevue-theme",
+      as: "MealiePrimeVueTheme",
+    },
+    options: {
+      unstyled: false,
+      darkModeSelector: ".dark",
+    },
+    components: {
+      prefix: "Prime",
+    },
+    directives: {
+      prefix: "prime",
+    },
   },
 
   // PWA module configuration: https://vite-pwa-org.netlify.app/frameworks/nuxt.html
