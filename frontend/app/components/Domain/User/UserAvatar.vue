@@ -1,38 +1,18 @@
 <template>
-  <v-tooltip
+  <PrimeAvatar
     v-if="userId"
-    :disabled="!user || !tooltip"
-    location="end"
+    v-prime-tooltip.right="{ value: user?.fullName ?? '', disabled: !user || !tooltip }"
+    shape="circle"
+    :style="avatarStyle"
   >
-    <template #activator="{ props: tooltipProps }">
-      <v-avatar
-        v-if="list"
-        v-bind="tooltipProps"
-      >
-        <v-img
-          :src="imageURL"
-          :alt="userId"
-          @load="error = false"
-          @error="error = true"
-        />
-      </v-avatar>
-      <v-avatar
-        v-else
-        :size="size"
-        v-bind="tooltipProps"
-      >
-        <v-img
-          :src="imageURL"
-          :alt="userId"
-          @load="error = false"
-          @error="error = true"
-        />
-      </v-avatar>
-    </template>
-    <span v-if="user">
-      {{ user.fullName }}
-    </span>
-  </v-tooltip>
+    <img
+      :src="imageURL"
+      :alt="user?.fullName || $t('user.user')"
+      class="user-avatar__image"
+      @load="error = false"
+      @error="error = true"
+    >
+  </PrimeAvatar>
 </template>
 
 <script setup lang="ts">
@@ -59,6 +39,16 @@ const props = defineProps({
 
 const error = ref(false);
 
+const avatarStyle = computed(() => {
+  const dimension = props.list
+    ? "40px"
+    : /^\d+(\.\d+)?$/.test(props.size) ? `${props.size}px` : props.size;
+  return {
+    width: dimension,
+    height: dimension,
+  };
+});
+
 const auth = useMealieAuth();
 const { store: users } = useUserStore();
 const user = computed(() => {
@@ -72,3 +62,11 @@ const imageURL = computed(() => {
   return `/api/media/users/${props.userId}/profile.webp?cacheKey=${key}`;
 });
 </script>
+
+<style scoped>
+.user-avatar__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+</style>
