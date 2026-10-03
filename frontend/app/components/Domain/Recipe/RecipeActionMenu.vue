@@ -21,7 +21,7 @@
 
     <v-spacer />
     <div v-if="!open" class="custom-btn-group ma-1">
-      <RecipeFavoriteBadge v-if="loggedIn" color="info" button-style :recipe-id="recipe.id!" show-always />
+      <RecipeFavoriteBadge v-if="loggedIn" button-style :recipe-id="recipe.id!" show-always />
       <RecipeTimelineBadge
         v-if="loggedIn"
         class="ml-1"
