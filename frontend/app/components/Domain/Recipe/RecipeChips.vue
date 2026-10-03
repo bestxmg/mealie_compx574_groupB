@@ -6,24 +6,21 @@
     >
       {{ title }}
     </h2>
-    <v-chip
+    <Tag
       v-for="category in items.slice(0, limit)"
       :key="category.name"
-      label
       class="mr-1 mt-1"
-      color="accent"
-      variant="flat"
-      :size="small ? 'small' : 'default'"
-      dark
-
+      :style="{ cursor: 'pointer', fontSize: small ? '0.75rem' : undefined }"
+      severity="info"
       @click.prevent="() => $emit('item-selected', category, urlPrefix)"
     >
       {{ truncateText(category.name) }}
-    </v-chip>
+    </Tag>
   </div>
 </template>
 
 <script setup lang="ts">
+import Tag from "primevue/tag";
 import type { RecipeCategory, RecipeTag, RecipeTool } from "~/lib/api/types/recipe";
 import { truncateText as truncatePlainText } from "~/lib/sanitize/text";
 
