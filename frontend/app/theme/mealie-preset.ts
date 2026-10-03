@@ -26,6 +26,29 @@ export const MealiePreset = definePreset(Aura, {
       },
     },
   },
+  components: {
+    // Aura's "info" severity is sky blue; Mealie's info is #1976d2 (same in light and dark
+    // mode). Every state is overridden, or hover/press/focus would fall back to sky blue.
+    button: {
+      root: {
+        info: {
+          background: "#1976d2",
+          hoverBackground: "#1565c0",
+          activeBackground: "#0d47a1",
+          borderColor: "#1976d2",
+          hoverBorderColor: "#1565c0",
+          activeBorderColor: "#0d47a1",
+          color: "#ffffff",
+          hoverColor: "#ffffff",
+          activeColor: "#ffffff",
+          focusRing: {
+            color: "#1976d2",
+            shadow: "none",
+          },
+        },
+      },
+    },
+  },
 });
 
 // Named brand colors used directly by components (severity props etc. use these names).

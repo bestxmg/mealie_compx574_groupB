@@ -5,7 +5,7 @@
     rounded
     :severity="buttonStyle ? 'info' : 'secondary'"
     :variant="buttonStyle ? undefined : 'text'"
-    :dt="buttonTokens"
+    class="recipe-favorite-badge"
     size="small"
     @click.prevent="toggleFavorite"
   >
@@ -21,7 +21,6 @@
 <script setup lang="ts">
 import Button from "primevue/button";
 import AppIcon from "~/components/global/AppIcon.vue";
-import { MealieColors } from "~/theme/mealie-preset";
 import { useUserSelfRatings } from "~/composables/use-users";
 import { useUserApi } from "~/composables/api";
 
@@ -35,15 +34,6 @@ const props = withDefaults(defineProps<Props>(), {
   showAlways: false,
   buttonStyle: false,
 });
-
-// Aura's "secondary" severity is neutral grey and "info" is sky blue; neither matches
-// Mealie's palette (MealiePreset only overrides "primary"). Override locally via
-// PrimeVue's `dt` prop rather than extending the shared preset, since this is the only
-// place these two severities need Mealie's actual brand colors.
-const buttonTokens = {
-  text: { secondary: { color: MealieColors.secondary } },
-  info: { background: MealieColors.info, borderColor: MealieColors.info, color: "#ffffff" },
-};
 
 const { userRatings, refreshUserRatings } = useUserSelfRatings();
 
@@ -66,3 +56,13 @@ async function toggleFavorite() {
   await refreshUserRatings();
 }
 </script>
+
+<style scoped>
+/* Aura's text "secondary" is neutral grey; the heart uses Mealie's secondary colour.
+   Set as a CSS variable here (one stylesheet) rather than PrimeVue's per-instance `dt`
+   prop, which injects a <style> element for every button. The "info" (buttonStyle)
+   colours come from MealiePreset. */
+.recipe-favorite-badge {
+  --p-button-text-secondary-color: #973542;
+}
+</style>
