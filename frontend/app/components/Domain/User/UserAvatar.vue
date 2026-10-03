@@ -1,42 +1,26 @@
 <template>
-  <v-tooltip
+  <Avatar
     v-if="userId"
-    :disabled="!user || !tooltip"
-    location="end"
+    v-tooltip.top="tooltip && user ? user.fullName : undefined"
+    shape="circle"
+    :aria-label="accessibleName"
+    :style="avatarStyle"
+    class="user-avatar"
   >
-    <template #activator="{ props: tooltipProps }">
-      <v-avatar
-        v-if="list"
-        v-bind="tooltipProps"
-      >
-        <v-img
-          :src="imageURL"
-          :alt="userId"
-          @load="error = false"
-          @error="error = true"
-        />
-      </v-avatar>
-      <v-avatar
-        v-else
-        :size="size"
-        v-bind="tooltipProps"
-      >
-        <v-img
-          :src="imageURL"
-          :alt="userId"
-          @load="error = false"
-          @error="error = true"
-        />
-      </v-avatar>
-    </template>
-    <span v-if="user">
-      {{ user.fullName }}
-    </span>
-  </v-tooltip>
+    <img
+      :src="imageURL"
+      :alt="accessibleName"
+      class="user-avatar-image"
+    >
+  </Avatar>
 </template>
 
 <script setup lang="ts">
+import Avatar from "primevue/avatar";
+import Tooltip from "primevue/tooltip";
 import { useUserStore } from "~/composables/store/use-user-store";
+
+const vTooltip = Tooltip;
 
 const props = defineProps({
   userId: {
@@ -57,8 +41,6 @@ const props = defineProps({
   },
 });
 
-const error = ref(false);
-
 const auth = useMealieAuth();
 const { store: users } = useUserStore();
 const user = computed(() => {
@@ -71,4 +53,30 @@ const imageURL = computed(() => {
   const key = authUser?.cacheKey ?? "";
   return `/api/media/users/${props.userId}/profile.webp?cacheKey=${key}`;
 });
+
+const i18n = useI18n();
+const accessibleName = computed(() => user.value?.fullName || i18n.t("user.user"));
+
+const avatarStyle = computed(() => {
+  const dimension = props.list ? "48px" : cssSize(props.size);
+  return { width: dimension, height: dimension, minWidth: dimension };
+});
+
+function cssSize(size: string) {
+  return /^\d+(?:\.\d+)?$/.test(size) ? `${size}px` : size;
+}
 </script>
+
+<style scoped>
+.user-avatar {
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.user-avatar-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+</style>
